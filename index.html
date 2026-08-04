@@ -13,10 +13,17 @@
   <main class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">PhotoBooth Studio</p>
-        <h1>Tạo dải ảnh tùy chỉnh của bạn</h1>
+        <p class="eyebrow" data-i18n="studio-eyebrow">PhotoBooth Studio</p>
+        <h1 data-i18n="app-title">Tạo dải ảnh tùy chỉnh của bạn</h1>
       </div>
-      <div class="progress" aria-label="Tiến trình">
+      <div class="settings-controls">
+        <select id="langSelect" aria-label="Ngôn ngữ / Language">
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+        </select>
+        <button id="themeToggle" type="button" aria-label="Chuyển chế độ / Toggle Theme">🌙</button>
+      </div>
+      <div class="progress" aria-label="Tiến trình" id="progressIndicator">
         <span class="progress-dot active" data-step-dot="setup">1</span>
         <span class="progress-dot" data-step-dot="capture">2</span>
         <span class="progress-dot" data-step-dot="review">3</span>
@@ -28,33 +35,33 @@
       <div class="setup-grid">
         <aside class="panel controls-panel">
           <div class="control-group">
-            <h2>Số lượng ảnh</h2>
+            <h2 data-i18n="photo-count">Số lượng ảnh</h2>
             <div class="option-grid" id="layoutOptions"></div>
           </div>
 
           <div class="control-group">
-            <h2>Kiểu khung hình</h2>
+            <h2 data-i18n="frame-style">Kiểu khung hình</h2>
             <div class="style-grid" id="frameOptions"></div>
           </div>
 
           <div class="control-group">
             <div class="section-title">
-              <h2>Nhãn dán</h2>
+              <h2 data-i18n="stickers">Nhãn dán</h2>
               <label class="toggle-line">
                 <input type="checkbox" id="applyStickerAll" checked>
-                <span>Áp dụng cho tất cả</span>
+                <span data-i18n="apply-to-all">Áp dụng cho tất cả</span>
               </label>
             </div>
             <div class="sticker-grid" id="stickerOptions"></div>
-            <p class="hint">Nhấp vào nhiều nhãn dán để chèn nhiều lớp. Kéo thả nhãn dán trên phần xem trước để thay đổi vị trí.</p>
+            <p class="hint" data-i18n="sticker-hint">Nhấp vào nhiều nhãn dán để chèn nhiều lớp. Kéo thả nhãn dán trên phần xem trước để thay đổi vị trí.</p>
           </div>
 
           <div class="control-group">
-            <h2>Chữ viết</h2>
-            <textarea id="captionInput" rows="3" placeholder="Nhập thông điệp của bạn..."></textarea>
+            <h2 data-i18n="text">Chữ viết</h2>
+            <textarea id="captionInput" rows="3" placeholder="Nhập thông điệp của bạn..." data-i18n-placeholder="caption-placeholder"></textarea>
             <div class="inline-fields">
               <label>
-                Phông chữ
+                <span data-i18n="font-label">Phông chữ</span>
                 <select id="fontSelect">
                   <option value="Inter">Inter</option>
                   <option value="Playfair Display">Playfair</option>
@@ -62,39 +69,39 @@
                 </select>
               </label>
               <label>
-                Màu sắc
+                <span data-i18n="color-label">Màu sắc</span>
                 <input type="color" id="textColor" value="#111827">
               </label>
               <label>
-                Vị trí nhanh
+                <span data-i18n="quick-position">Vị trí nhanh</span>
                 <select id="textPosition">
-                  <option value="bottom">Dưới cùng</option>
-                  <option value="top">Trên cùng</option>
-                  <option value="center">Ở giữa</option>
-                  <option value="custom">Tùy chỉnh</option>
+                  <option value="bottom" data-i18n="position-bottom">Dưới cùng</option>
+                  <option value="top" data-i18n="position-top">Trên cùng</option>
+                  <option value="center" data-i18n="position-center">Ở giữa</option>
+                  <option value="custom" data-i18n="position-custom">Tùy chỉnh</option>
                 </select>
               </label>
             </div>
-            <p class="hint">Kéo trực tiếp văn bản trên phần xem trước để đặt ở bất kỳ đâu.</p>
+            <p class="hint" data-i18n="text-hint">Kéo trực tiếp văn bản trên phần xem trước để đặt ở bất kỳ đâu.</p>
           </div>
 
           <div class="control-group compact">
-            <h2>Đếm ngược</h2>
+            <h2 data-i18n="countdown">Đếm ngược</h2>
             <div class="segmented" id="countdownOptions">
-              <button type="button" data-countdown="3" class="active">3 giây</button>
-              <button type="button" data-countdown="5">5 giây</button>
-              <button type="button" data-countdown="10">10 giây</button>
+              <button type="button" data-countdown="3" class="active" data-i18n="3s">3 giây</button>
+              <button type="button" data-countdown="5" data-i18n="5s">5 giây</button>
+              <button type="button" data-countdown="10" data-i18n="10s">10 giây</button>
             </div>
           </div>
 
-          <button class="primary-action" id="startButton" type="button">Bắt đầu</button>
+          <button class="primary-action" id="startButton" type="button" data-i18n="start-btn">Bắt đầu</button>
         </aside>
 
         <section class="panel preview-panel">
           <div class="preview-heading">
             <div>
-              <p class="eyebrow">Xem trước</p>
-              <h2>Bố cục hoàn chỉnh</h2>
+              <p class="eyebrow" data-i18n="preview-eyebrow">Xem trước</p>
+              <h2 data-i18n="final-layout">Bố cục hoàn chỉnh</h2>
             </div>
             <span id="layoutLabel"></span>
           </div>
@@ -110,28 +117,28 @@
         <section class="panel camera-panel">
           <div class="camera-wrap">
             <video id="cameraVideo" autoplay playsinline muted></video>
-            <div class="camera-placeholder" id="cameraPlaceholder">Camera chưa sẵn sàng</div>
+            <div class="camera-placeholder" id="cameraPlaceholder" data-i18n="camera-not-ready">Camera chưa sẵn sàng</div>
             <div class="countdown-badge" id="countdownBadge"></div>
             <div class="flash" id="flash"></div>
           </div>
           <div class="capture-actions">
-            <button class="secondary-action" id="backSetupButton" type="button">Quay lại thiết lập</button>
-            <button class="shutter" id="captureButton" type="button">Chụp ảnh</button>
-            <button class="secondary-action" id="uploadPhotoButton" type="button">Chọn ảnh</button>
+            <button class="secondary-action" id="backSetupButton" type="button" data-i18n="back-btn">Quay lại thiết lập</button>
+            <button class="shutter" id="captureButton" type="button" data-i18n="capture-btn">Chụp ảnh</button>
+            <button class="secondary-action" id="uploadPhotoButton" type="button" data-i18n="choose-photo-btn">Chọn ảnh</button>
             <input type="file" id="photoUploadInput" accept="image/*" hidden>
             <div class="mini-countdown">
-              <span>Camera</span>
+              <span data-i18n="camera-label">Camera</span>
               <select id="cameraFacing">
-                <option value="user">Trước (Front)</option>
-                <option value="environment">Sau (Rear)</option>
+                <option value="user" data-i18n="camera-front">Trước (Front)</option>
+                <option value="environment" data-i18n="camera-rear">Sau (Rear)</option>
               </select>
             </div>
             <div class="mini-countdown">
-              <span>Đếm ngược</span>
+              <span data-i18n="countdown-label">Đếm ngược</span>
               <select id="captureCountdown">
-                <option value="3">3 giây</option>
-                <option value="5">5 giây</option>
-                <option value="10">10 giây</option>
+                <option value="3" data-i18n="3s">3 giây</option>
+                <option value="5" data-i18n="5s">5 giây</option>
+                <option value="10" data-i18n="10s">10 giây</option>
               </select>
             </div>
           </div>
@@ -139,7 +146,7 @@
         <section class="panel">
           <div class="preview-heading">
             <div>
-              <p class="eyebrow">Chụp ảnh</p>
+              <p class="eyebrow" data-i18n="capture-eyebrow">Chụp ảnh</p>
               <h2 id="captureTitle">Khung 1</h2>
             </div>
             <span id="slotCounter"></span>
@@ -155,10 +162,10 @@
       <section class="panel">
         <div class="review-header">
           <div>
-            <p class="eyebrow">Xem lại</p>
-            <h2>Kiểm tra ảnh của bạn trước khi xuất</h2>
+            <p class="eyebrow" data-i18n="review-eyebrow">Xem lại</p>
+            <h2 data-i18n="review-title">Kiểm tra ảnh của bạn trước khi xuất</h2>
           </div>
-          <button class="primary-action" id="nextExportButton" type="button" disabled>Tiếp tục</button>
+          <button class="primary-action" id="nextExportButton" type="button" disabled data-i18n="next-btn">Tiếp tục</button>
         </div>
         <div class="strip-stage">
           <div id="reviewStrip" class="photo-strip"></div>
@@ -172,28 +179,28 @@
         <section class="panel">
           <div class="preview-heading">
             <div>
-              <p class="eyebrow">Xuất ảnh</p>
-              <h2>Ảnh hoàn chỉnh</h2>
+              <p class="eyebrow" data-i18n="export-eyebrow">Xuất ảnh</p>
+              <h2 data-i18n="final-image">Ảnh hoàn chỉnh</h2>
             </div>
           </div>
           <canvas id="exportCanvas" width="1200" height="1800"></canvas>
         </section>
         <aside class="panel export-actions">
           <label class="download-name-field">
-            Tên file dải ảnh
-            <input type="text" id="stripFileName" value="dai-anh-photobooth" placeholder="Tên file">
+            <span data-i18n="strip-file-name">Tên file dải ảnh</span>
+            <input type="text" id="stripFileName" value="dai-anh-photobooth" placeholder="Tên file" data-i18n-placeholder="file-name-placeholder">
           </label>
-          <button class="primary-action" id="downloadStripButton" type="button">Tải dải ảnh</button>
-          <button class="secondary-action" id="shareButton" type="button">Chia sẻ</button>
+          <button class="primary-action" id="downloadStripButton" type="button" data-i18n="download-strip-btn">Tải dải ảnh</button>
+          <button class="secondary-action" id="shareButton" type="button" data-i18n="share-btn">Chia sẻ</button>
           <div class="download-picker">
             <div class="section-title">
-              <h2>Tải ảnh đơn lẻ</h2>
-              <button class="ghost-action small-action" id="selectAllPhotosButton" type="button">Chọn tất cả</button>
+              <h2 data-i18n="download-single-photos">Tải ảnh đơn lẻ</h2>
+              <button class="ghost-action small-action" id="selectAllPhotosButton" type="button" data-i18n="select-all-btn">Chọn tất cả</button>
             </div>
             <div id="photoDownloadList" class="photo-download-list"></div>
           </div>
-          <button class="secondary-action" id="downloadPhotosButton" type="button">Tải ảnh đã chọn</button>
-          <button class="ghost-action" id="newSessionButton" type="button">Tạo bộ ảnh mới</button>
+          <button class="secondary-action" id="downloadPhotosButton" type="button" data-i18n="download-selected-btn">Tải ảnh đã chọn</button>
+          <button class="ghost-action" id="newSessionButton" type="button" data-i18n="new-session-btn">Tạo bộ ảnh mới</button>
         </aside>
       </div>
     </section>

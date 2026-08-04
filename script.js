@@ -1,17 +1,162 @@
+const translations = {
+  vi: {
+    "app-title": "Tạo dải ảnh tùy chỉnh của bạn",
+    "studio-eyebrow": "PhotoBooth Studio",
+    "photo-count": "Số lượng ảnh",
+    "frame-style": "Kiểu khung hình",
+    "stickers": "Nhãn dán",
+    "apply-to-all": "Áp dụng cho tất cả",
+    "sticker-hint": "Nhấp vào nhiều nhãn dán để chèn nhiều lớp. Kéo thả nhãn dán trên phần xem trước để thay đổi vị trí.",
+    "text": "Chữ viết",
+    "caption-placeholder": "Nhập thông điệp của bạn...",
+    "font-label": "Phông chữ",
+    "color-label": "Màu sắc",
+    "quick-position": "Vị trí nhanh",
+    "position-bottom": "Dưới cùng",
+    "position-top": "Trên cùng",
+    "position-center": "Ở giữa",
+    "position-custom": "Tùy chỉnh",
+    "text-hint": "Kéo trực tiếp văn bản trên phần xem trước để đặt ở bất kỳ đâu.",
+    "countdown": "Đếm ngược",
+    "3s": "3 giây",
+    "5s": "5 giây",
+    "10s": "10 giây",
+    "start-btn": "Bắt đầu",
+    "preview-eyebrow": "Xem trước",
+    "final-layout": "Bố cục hoàn chỉnh",
+    "camera-not-ready": "Camera chưa sẵn sàng",
+    "back-btn": "Quay lại thiết lập",
+    "capture-btn": "Chụp ảnh",
+    "choose-photo-btn": "Chọn ảnh",
+    "camera-label": "Camera",
+    "camera-front": "Trước (Front)",
+    "camera-rear": "Sau (Rear)",
+    "countdown-label": "Đếm ngược",
+    "capture-eyebrow": "Chụp ảnh",
+    "review-eyebrow": "Xem lại",
+    "review-title": "Kiểm tra ảnh của bạn trước khi xuất",
+    "next-btn": "Tiếp tục",
+    "export-eyebrow": "Xuất ảnh",
+    "final-image": "Ảnh hoàn chỉnh",
+    "strip-file-name": "Tên file dải ảnh",
+    "file-name-placeholder": "Tên file",
+    "download-strip-btn": "Tải dải ảnh",
+    "share-btn": "Chia sẻ",
+    "download-single-photos": "Tải ảnh đơn lẻ",
+    "select-all-btn": "Chọn tất cả",
+    "download-selected-btn": "Tải ảnh đã chọn",
+    "new-session-btn": "Tạo bộ ảnh mới",
+    
+    // Dynamic text
+    "layout-2v": "2 ảnh dọc",
+    "layout-2h": "2 ảnh ngang",
+    "layout-3v": "3 ảnh dọc",
+    "layout-4v": "4 ảnh dọc",
+    "layout-4h": "4 ảnh ngang",
+    
+    "frame-vintage": "Cổ điển (Vintage)",
+    "frame-polaroid": "Polaroid",
+    "frame-neon": "Neon",
+    "frame-clean": "Tối giản (Clean)",
+    "frame-film": "Dải phim (Film)",
+    
+    "camera-error": "Không thể mở camera. Vui lòng cho phép quyền truy cập camera trên trình duyệt của bạn.",
+    "camera-opening": "Đang mở camera...",
+    "slot-label": "Khung",
+    "slot-delete": "Xóa",
+    "all-photos-captured": "Đã chụp xong tất cả",
+    "photos-count-label": "ảnh",
+    "retake-slot": "Chụp lại khung",
+    "photo-placeholder": "Tên file ảnh",
+    "slot-text": "Khung"
+  },
+  en: {
+    "app-title": "Create a custom photo strip",
+    "studio-eyebrow": "PhotoBooth Studio",
+    "photo-count": "Photo count",
+    "frame-style": "Frame style",
+    "stickers": "Stickers",
+    "apply-to-all": "Apply to all",
+    "sticker-hint": "Click multiple stickers to add layers. Drag them on the preview to reposition.",
+    "text": "Text",
+    "caption-placeholder": "Enter your message...",
+    "font-label": "Font",
+    "color-label": "Color",
+    "quick-position": "Quick position",
+    "position-bottom": "Bottom",
+    "position-top": "Top",
+    "position-center": "Center",
+    "position-custom": "Custom",
+    "text-hint": "Drag the text directly on the preview to place it anywhere.",
+    "countdown": "Countdown",
+    "3s": "3s",
+    "5s": "5s",
+    "10s": "10s",
+    "start-btn": "Start",
+    "preview-eyebrow": "Preview",
+    "final-layout": "Final layout",
+    "camera-not-ready": "Camera is not ready",
+    "back-btn": "Back to setup",
+    "capture-btn": "Capture",
+    "choose-photo-btn": "Choose photo",
+    "camera-label": "Camera",
+    "camera-front": "Front",
+    "camera-rear": "Rear",
+    "countdown-label": "Countdown",
+    "capture-eyebrow": "Capture",
+    "review-eyebrow": "Review",
+    "review-title": "Check your photos before export",
+    "next-btn": "Next",
+    "export-eyebrow": "Export",
+    "final-image": "Final image",
+    "strip-file-name": "Strip file name",
+    "file-name-placeholder": "File name",
+    "download-strip-btn": "Download strip",
+    "share-btn": "Share",
+    "download-single-photos": "Download individual photos",
+    "select-all-btn": "Select all",
+    "download-selected-btn": "Download selected photos",
+    "new-session-btn": "Create new set",
+    
+    // Dynamic text
+    "layout-2v": "2 photos vertical",
+    "layout-2h": "2 photos horizontal",
+    "layout-3v": "3 photos vertical",
+    "layout-4v": "4 photos vertical",
+    "layout-4h": "4 photos horizontal",
+    
+    "frame-vintage": "Vintage",
+    "frame-polaroid": "Polaroid",
+    "frame-neon": "Neon",
+    "frame-clean": "Clean",
+    "frame-film": "Film Strip",
+    
+    "camera-error": "Camera could not be opened. Please allow camera access in your browser.",
+    "camera-opening": "Opening camera...",
+    "slot-label": "Slot",
+    "slot-delete": "Delete",
+    "all-photos-captured": "All photos captured",
+    "photos-count-label": "photos",
+    "retake-slot": "Retake slot",
+    "photo-placeholder": "Photo file name",
+    "slot-text": "Slot"
+  }
+};
+
 const layouts = [
-  { id: "2v", label: "2 ảnh dọc", count: 2, orientation: "vertical" },
-  { id: "2h", label: "2 ảnh ngang", count: 2, orientation: "horizontal" },
-  { id: "3v", label: "3 ảnh dọc", count: 3, orientation: "vertical" },
-  { id: "4v", label: "4 ảnh dọc", count: 4, orientation: "vertical" },
-  { id: "4h", label: "4 ảnh ngang", count: 4, orientation: "horizontal" },
+  { id: "2v", labelKey: "layout-2v", count: 2, orientation: "vertical" },
+  { id: "2h", labelKey: "layout-2h", count: 2, orientation: "horizontal" },
+  { id: "3v", labelKey: "layout-3v", count: 3, orientation: "vertical" },
+  { id: "4v", labelKey: "layout-4v", count: 4, orientation: "vertical" },
+  { id: "4h", labelKey: "layout-4h", count: 4, orientation: "horizontal" },
 ];
 
 const frames = [
-  { id: "vintage", label: "Cổ điển (Vintage)", swatch: "#f5ead3" },
-  { id: "polaroid", label: "Polaroid", swatch: "#fbfbf7" },
-  { id: "neon", label: "Neon", swatch: "#111827" },
-  { id: "clean", label: "Tối giản (Clean)", swatch: "#ffffff" },
-  { id: "film", label: "Dải phim (Film)", swatch: "#151515" },
+  { id: "vintage", labelKey: "frame-vintage", swatch: "#f5ead3" },
+  { id: "polaroid", labelKey: "frame-polaroid", swatch: "#fbfbf7" },
+  { id: "neon", labelKey: "frame-neon", swatch: "#111827" },
+  { id: "clean", labelKey: "frame-clean", swatch: "#ffffff" },
+  { id: "film", labelKey: "frame-film", swatch: "#151515" },
 ];
 
 const stickers = [
@@ -25,7 +170,10 @@ const stickers = [
   "🍒",
   "🕊️"
 ];
+
 const state = {
+  lang: localStorage.getItem("photobooth-lang") || "vi",
+  theme: localStorage.getItem("photobooth-theme") || "light",
   layout: layouts[3],
   frame: frames[0],
   applyStickerAll: true,
@@ -51,7 +199,47 @@ const reviewStrip = $("#reviewStrip");
 const exportCanvas = $("#exportCanvas");
 const captureCanvas = $("#captureCanvas");
 
+function t(key) {
+  return translations[state.lang]?.[key] || key;
+}
+
+function applyTheme(theme) {
+  state.theme = theme;
+  localStorage.setItem("photobooth-theme", theme);
+  const body = document.body;
+  if (theme === "dark") {
+    body.classList.add("dark-theme");
+    $("#themeToggle").textContent = "☀️";
+  } else {
+    body.classList.remove("dark-theme");
+    $("#themeToggle").textContent = "🌙";
+  }
+}
+
+function applyLanguage(lang) {
+  state.lang = lang;
+  localStorage.setItem("photobooth-lang", lang);
+  
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+  
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    el.placeholder = t(key);
+  });
+  
+  renderLayoutOptions();
+  renderFrameOptions();
+  renderAllStrips();
+}
+
 function init() {
+  applyTheme(state.theme);
+  applyLanguage(state.lang);
+  $("#langSelect").value = state.lang;
+  
   renderLayoutOptions();
   renderFrameOptions();
   renderStickerOptions();
@@ -62,7 +250,7 @@ function init() {
 
 function renderLayoutOptions() {
   $("#layoutOptions").innerHTML = layouts.map((layout) => (
-    `<button type="button" class="option-card ${layout.id === state.layout.id ? "active" : ""}" data-layout="${layout.id}">${layout.label}</button>`
+    `<button type="button" class="option-card ${layout.id === state.layout.id ? "active" : ""}" data-layout="${layout.id}">${t(layout.labelKey)}</button>`
   )).join("");
 }
 
@@ -70,7 +258,7 @@ function renderFrameOptions() {
   $("#frameOptions").innerHTML = frames.map((frame) => (
     `<button type="button" class="style-card ${frame.id === state.frame.id ? "active" : ""}" data-frame="${frame.id}">
       <span class="style-swatch" style="background:${frame.swatch}"></span>
-      <span>${frame.label}</span>
+      <span>${t(frame.labelKey)}</span>
     </button>`
   )).join("");
 }
@@ -82,6 +270,15 @@ function renderStickerOptions() {
 }
 
 function bindControls() {
+  $("#langSelect").addEventListener("change", (event) => {
+    applyLanguage(event.target.value);
+  });
+
+  $("#themeToggle").addEventListener("click", () => {
+    const nextTheme = state.theme === "light" ? "dark" : "light";
+    applyTheme(nextTheme);
+  });
+
   $("#layoutOptions").addEventListener("click", (event) => {
     const id = event.target.closest("button")?.dataset.layout;
     if (!id) return;
@@ -358,14 +555,14 @@ async function ensureCamera() {
     updateCameraMirror();
     $("#cameraPlaceholder").classList.add("hidden");
   } catch (error) {
-    $("#cameraPlaceholder").textContent = "Không thể mở camera. Vui lòng cho phép quyền truy cập camera trên trình duyệt của bạn.";
+    $("#cameraPlaceholder").textContent = t("camera-error");
   }
 }
 
 async function switchCamera() {
   stopCamera();
   $("#cameraPlaceholder").classList.remove("hidden");
-  $("#cameraPlaceholder").textContent = "Đang mở camera...";
+  $("#cameraPlaceholder").textContent = t("camera-opening");
   await ensureCamera();
   renderAllStrips();
 }
@@ -483,14 +680,14 @@ function findNextEmptySlot() {
 }
 
 function updateStatus() {
-  $("#layoutLabel").textContent = state.layout.label;
-  $("#captureTitle").textContent = state.activeSlot >= 0 ? `Khung ${state.activeSlot + 1}` : "Đã chụp xong tất cả";
-  $("#slotCounter").textContent = `${state.photos.filter(Boolean).length}/${state.layout.count} ảnh`;
+  $("#layoutLabel").textContent = t(state.layout.labelKey);
+  $("#captureTitle").textContent = state.activeSlot >= 0 ? `${t("slot-label")} ${state.activeSlot + 1}` : t("all-photos-captured");
+  $("#slotCounter").textContent = `${state.photos.filter(Boolean).length}/${state.layout.count} ${t("photos-count-label")}`;
   $("#captureButton").disabled = state.activeSlot === -1 || state.isCounting;
   $("#uploadPhotoButton").disabled = state.activeSlot === -1 || state.isCounting;
   $("#nextExportButton").disabled = state.photos.some((photo) => !photo);
   $("#reviewActions").innerHTML = state.photos.map((photo, index) => (
-    `<button type="button" class="secondary-action" data-retake="${index}" ${photo ? "disabled" : ""}>Chụp lại khung ${index + 1}</button>`
+    `<button type="button" class="secondary-action" data-retake="${index}" ${photo ? "disabled" : ""}>${t("retake-slot")} ${index + 1}</button>`
   )).join("");
 
   $("#reviewActions").querySelectorAll("[data-retake]").forEach((button) => {
@@ -520,7 +717,7 @@ function preparePhotoDownloadList() {
   state.photoDownloads = state.photos.map((photo, index) => ({
     photo,
     selected: true,
-    name: state.photoDownloads[index]?.name || `anh-photobooth-${index + 1}`,
+    name: state.photoDownloads[index]?.name || (state.lang === "vi" ? `anh-photobooth-${index + 1}` : `photobooth-photo-${index + 1}`),
   }));
   renderPhotoDownloadList();
 }
@@ -530,10 +727,10 @@ function renderPhotoDownloadList() {
   list.innerHTML = state.photoDownloads.map((item, index) => `
     <label class="photo-download-row">
       <input type="checkbox" data-photo-selected="${index}" ${item.selected ? "checked" : ""}>
-      <img src="${item.photo}" alt="Ảnh ${index + 1}">
+      <img src="${item.photo}" alt="${t("slot-label")} ${index + 1}">
       <span>
-        <span>Khung ${index + 1}</span>
-        <input type="text" data-photo-name="${index}" value="${escapeHtml(item.name)}" placeholder="Tên file ảnh ${index + 1}">
+        <span>${t("slot-text")} ${index + 1}</span>
+        <input type="text" data-photo-name="${index}" value="${escapeHtml(item.name)}" placeholder="${t("photo-placeholder")} ${index + 1}">
       </span>
     </label>
   `).join("");
@@ -654,7 +851,7 @@ function downloadPhotos() {
   state.photoDownloads.forEach((item, index) => {
     if (!item.selected) return;
     const link = document.createElement("a");
-    link.download = `${safeFileName(item.name || `photobooth-photo-${index + 1}`)}.jpg`;
+    link.download = `${safeFileName(item.name || (state.lang === "vi" ? `anh-photobooth-${index + 1}` : `photobooth-photo-${index + 1}`))}.jpg`;
     link.href = item.photo;
     link.click();
   });
