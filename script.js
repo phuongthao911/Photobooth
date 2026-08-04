@@ -171,9 +171,26 @@ const stickers = [
   "🕊️"
 ];
 
+const safeStorage = {
+  getItem(key, fallback) {
+    try {
+      return localStorage.getItem(key) || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  },
+  setItem(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      // ignore
+    }
+  }
+};
+
 const state = {
-  lang: localStorage.getItem("photobooth-lang") || "vi",
-  theme: localStorage.getItem("photobooth-theme") || "light",
+  lang: safeStorage.getItem("photobooth-lang", "vi"),
+  theme: safeStorage.getItem("photobooth-theme", "light"),
   layout: layouts[3],
   frame: frames[0],
   applyStickerAll: true,
@@ -205,7 +222,7 @@ function t(key) {
 
 function applyTheme(theme) {
   state.theme = theme;
-  localStorage.setItem("photobooth-theme", theme);
+  safeStorage.setItem("photobooth-theme", theme);
   const body = document.body;
   if (theme === "dark") {
     body.classList.add("dark-theme");
@@ -218,7 +235,7 @@ function applyTheme(theme) {
 
 function applyLanguage(lang) {
   state.lang = lang;
-  localStorage.setItem("photobooth-lang", lang);
+  safeStorage.setItem("photobooth-lang", lang);
   
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
