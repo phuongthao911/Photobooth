@@ -1182,16 +1182,17 @@ function openCropModal(imageSrc, slotIndex) {
     viewport.style.height = `${maxDim}px`;
   }
   
-  img.src = imageSrc;
-  
   img.onload = () => {
     cropState.scale = 1;
     cropState.x = 0;
     cropState.y = 0;
     $("#cropZoom").value = 1;
     
-    const vW = viewport.clientWidth;
-    const vH = viewport.clientHeight;
+    // Show modal first so clientWidth/clientHeight are populated in DOM layout
+    $("#cropModal").classList.remove("hidden");
+    
+    const vW = viewport.clientWidth || (cropState.aspectRatio >= 1 ? maxDim : maxDim * cropState.aspectRatio);
+    const vH = viewport.clientHeight || (cropState.aspectRatio >= 1 ? maxDim / cropState.aspectRatio : maxDim);
     
     const scaleToCover = Math.max(vW / img.naturalWidth, vH / img.naturalHeight);
     cropState.imgWidth = img.naturalWidth * scaleToCover;
@@ -1204,8 +1205,9 @@ function openCropModal(imageSrc, slotIndex) {
     cropState.y = (vH - cropState.imgHeight) / 2;
     
     updateCropImageTransform();
-    $("#cropModal").classList.remove("hidden");
   };
+  
+  img.src = imageSrc;
 }
 
 function updateCropImageTransform() {
