@@ -46,20 +46,20 @@ const translations = {
     "select-all-btn": "Chọn tất cả",
     "download-selected-btn": "Tải ảnh đã chọn",
     "new-session-btn": "Tạo bộ ảnh mới",
-    
+
     // Dynamic text
     "layout-2v": "2 ảnh dọc",
     "layout-2h": "2 ảnh ngang",
     "layout-3v": "3 ảnh dọc",
     "layout-4v": "4 ảnh dọc",
     "layout-4h": "4 ảnh ngang",
-    
+
     "frame-vintage": "Cổ điển (Vintage)",
     "frame-polaroid": "Polaroid",
     "frame-neon": "Neon",
     "frame-clean": "Tối giản (Clean)",
     "frame-film": "Dải phim (Film)",
-    
+
     "camera-error": "Không thể mở camera. Vui lòng cho phép quyền truy cập camera trên trình duyệt của bạn.",
     "camera-opening": "Đang mở camera...",
     "slot-label": "Khung",
@@ -68,7 +68,16 @@ const translations = {
     "photos-count-label": "ảnh",
     "retake-slot": "Chụp lại khung",
     "photo-placeholder": "Tên file ảnh",
-    "slot-text": "Khung"
+    "slot-text": "Khung",
+    "temp-retake": "Chụp lại",
+    "temp-confirm": "Lưu ảnh",
+    "filter-label": "Bộ lọc màu",
+    "doodle-label": "Vẽ tay / Bút màu",
+    "doodle-color": "Màu sắc",
+    "doodle-size": "Cỡ bút",
+    "doodle-clear": "Xóa vẽ",
+    "retake-all-btn": "Chụp lại toàn bộ",
+    "doodle-active": "Kích hoạt bút vẽ"
   },
   en: {
     "app-title": "Create a custom photo strip",
@@ -117,20 +126,20 @@ const translations = {
     "select-all-btn": "Select all",
     "download-selected-btn": "Download selected photos",
     "new-session-btn": "Create new set",
-    
+
     // Dynamic text
     "layout-2v": "2 photos vertical",
     "layout-2h": "2 photos horizontal",
     "layout-3v": "3 photos vertical",
     "layout-4v": "4 photos vertical",
     "layout-4h": "4 photos horizontal",
-    
+
     "frame-vintage": "Vintage",
     "frame-polaroid": "Polaroid",
     "frame-neon": "Neon",
     "frame-clean": "Clean",
     "frame-film": "Film Strip",
-    
+
     "camera-error": "Camera could not be opened. Please allow camera access in your browser.",
     "camera-opening": "Opening camera...",
     "slot-label": "Slot",
@@ -139,7 +148,16 @@ const translations = {
     "photos-count-label": "photos",
     "retake-slot": "Retake slot",
     "photo-placeholder": "Photo file name",
-    "slot-text": "Slot"
+    "slot-text": "Slot",
+    "temp-retake": "Retake",
+    "temp-confirm": "Keep photo",
+    "filter-label": "Color filter",
+    "doodle-label": "Doodle / Paint",
+    "doodle-color": "Color",
+    "doodle-size": "Brush size",
+    "doodle-clear": "Clear drawings",
+    "retake-all-btn": "Retake all",
+    "doodle-active": "Enable drawing brush"
   }
 };
 
@@ -207,6 +225,12 @@ const state = {
   facingMode: "user",
   stream: null,
   isCounting: false,
+  tempCapturedFrame: null,
+  filter: "none",
+  doodles: [],
+  doodleMode: false,
+  doodleColor: "#e0442f",
+  doodleSize: 8,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -236,17 +260,17 @@ function applyTheme(theme) {
 function applyLanguage(lang) {
   state.lang = lang;
   safeStorage.setItem("photobooth-lang", lang);
-  
+
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     el.textContent = t(key);
   });
-  
+
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
     const key = el.getAttribute("data-i18n-placeholder");
     el.placeholder = t(key);
   });
-  
+
   renderLayoutOptions();
   renderFrameOptions();
   renderAllStrips();
@@ -256,7 +280,7 @@ function init() {
   applyTheme(state.theme);
   applyLanguage(state.lang);
   $("#langSelect").value = state.lang;
-  
+
   renderLayoutOptions();
   renderFrameOptions();
   renderStickerOptions();
@@ -389,12 +413,136 @@ function bindControls() {
   $("#selectAllPhotosButton").addEventListener("click", selectAllPhotosForDownload);
   $("#shareButton").addEventListener("click", shareStrip);
   $("#newSessionButton").addEventListener("click", newSession);
+
+  $("#filterSelect").addEventListener("change", (event) => {
+    state.filter = event.target.value;
+    $("#cameraVideo").style.filter = getCSSFilterString(state.filter);
+    renderAllStrips();
+    if (document.querySelector("#exportScreen.active")) {
+      drawExportCanvas();
+    }
+  });
+
+  $("#doodleToggle").addEventListener("change", (event) => {
+    state.doodleMode = event.target.checked;
+    $("#doodleSettings").style.display = state.doodleMode ? "grid" : "none";
+    renderAllStrips();
+  });
+
+  $("#doodleColor").addEventListener("input", (event) => {
+    state.doodleColor = event.target.value;
+  });
+
+  $("#doodleSize").addEventListener("change", (event) => {
+    state.doodleSize = Number(event.target.value);
+  });
+
+  $("#doodleClear").addEventListener("click", () => {
+    state.doodles = [];
+    renderAllStrips();
+  });
+
+  $("#tempRetakeBtn").addEventListener("click", () => {
+    $("#tempReviewOverlay").classList.add("hidden");
+    state.tempCapturedFrame = null;
+  });
+
+  $("#tempConfirmBtn").addEventListener("click", () => {
+    if (!state.tempCapturedFrame) return;
+    const { dataUrl, slotIndex } = state.tempCapturedFrame;
+    state.photos[slotIndex] = dataUrl;
+    state.activeSlot = findNextEmptySlot();
+    state.tempCapturedFrame = null;
+    $("#tempReviewOverlay").classList.add("hidden");
+    renderAllStrips();
+    if (state.activeSlot === -1) {
+      showScreen("review");
+    }
+  });
+
+  $("#retakeAllReviewBtn").addEventListener("click", retakeAll);
+  $("#retakeAllExportBtn").addEventListener("click", retakeAll);
 }
 
 function resetPhotos() {
   state.photos = Array.from({ length: state.layout.count }, () => null);
   state.photoDownloads = [];
   state.activeSlot = 0;
+}
+
+function getCSSFilterString(filterType) {
+  switch (filterType) {
+    case "grayscale": return "grayscale(1)";
+    case "sepia": return "sepia(0.85) contrast(1.1)";
+    case "warm": return "sepia(0.3) saturate(1.3) contrast(1.05)";
+    case "cold": return "hue-rotate(180deg) saturate(1.1)";
+    case "vintage": return "contrast(1.2) brightness(0.9) sepia(0.4)";
+    default: return "none";
+  }
+}
+
+let isDrawing = false;
+let currentStroke = null;
+
+function handleDoodlePointerDown(event) {
+  if (!state.doodleMode) return;
+  const canvas = event.currentTarget;
+  const rect = canvas.getBoundingClientRect();
+  isDrawing = true;
+  canvas.setPointerCapture(event.pointerId);
+  
+  const x = ((event.clientX - rect.left) / rect.width) * 100;
+  const y = ((event.clientY - rect.top) / rect.height) * 100;
+  
+  currentStroke = {
+    color: state.doodleColor,
+    width: state.doodleSize,
+    points: [{ x, y }]
+  };
+  state.doodles.push(currentStroke);
+}
+
+function handleDoodlePointerMove(event) {
+  if (!isDrawing || !currentStroke) return;
+  const canvas = event.currentTarget;
+  const rect = canvas.getBoundingClientRect();
+  
+  const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+  const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
+  
+  currentStroke.points.push({ x, y });
+  drawDoodlesOnCanvas(canvas, state.doodles);
+}
+
+function handleDoodlePointerUp(event) {
+  if (!isDrawing) return;
+  isDrawing = false;
+  currentStroke = null;
+  renderAllStrips();
+}
+
+function drawDoodlesOnCanvas(canvas, doodles) {
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  doodles.forEach(stroke => {
+    if (stroke.points.length < 1) return;
+    ctx.beginPath();
+    ctx.strokeStyle = stroke.color;
+    const scaledWidth = stroke.width * (canvas.width / 420);
+    ctx.lineWidth = Math.max(1, scaledWidth);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    
+    const start = stroke.points[0];
+    ctx.moveTo((start.x / 100) * canvas.width, (start.y / 100) * canvas.height);
+    
+    for (let i = 1; i < stroke.points.length; i++) {
+      const pt = stroke.points[i];
+      ctx.lineTo((pt.x / 100) * canvas.width, (pt.y / 100) * canvas.height);
+    }
+    ctx.stroke();
+  });
 }
 
 function renderAllStrips() {
@@ -406,6 +554,9 @@ function renderAllStrips() {
 
 function renderStrip(container, { mode }) {
   container.className = `photo-strip ${state.layout.orientation} ${state.frame.id}`;
+
+  // Find existing video element to reuse before clearing
+  const existingVideo = container.querySelector("video");
   container.innerHTML = "";
 
   for (let index = 0; index < state.layout.count; index += 1) {
@@ -421,14 +572,23 @@ function renderStrip(container, { mode }) {
       const img = document.createElement("img");
       img.src = state.photos[index];
       img.alt = `Photo ${index + 1}`;
+      img.style.filter = getCSSFilterString(state.filter);
       slot.append(img);
     } else if (mode === "capture" && index === state.activeSlot && state.stream) {
-      const video = $("#cameraVideo").cloneNode();
-      video.srcObject = state.stream;
-      video.autoplay = true;
-      video.playsInline = true;
-      video.muted = true;
-      video.className = state.facingMode === "user" ? "mirrored" : "rear-facing";
+      let video;
+      if (existingVideo) {
+        video = existingVideo;
+      } else {
+        video = $("#cameraVideo").cloneNode();
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+      }
+      if (video.srcObject !== state.stream) {
+        video.srcObject = state.stream;
+      }
+      video.className = state.facingMode === "user" ? "mirrored" : "";
+      video.style.filter = getCSSFilterString(state.filter);
       slot.append(video);
     }
 
@@ -436,7 +596,7 @@ function renderStrip(container, { mode }) {
       const remove = document.createElement("button");
       remove.type = "button";
       remove.className = "slot-delete";
-      remove.textContent = "Xóa";
+      remove.textContent = t("slot-delete");
       remove.addEventListener("click", () => deleteSlot(index));
       slot.append(remove);
     }
@@ -445,6 +605,20 @@ function renderStrip(container, { mode }) {
   }
 
   addDecorations(container);
+
+  // Add Doodle Canvas overlay
+  const doodleCanvas = document.createElement("canvas");
+  doodleCanvas.className = "doodle-canvas" + (state.doodleMode ? " active" : "");
+  doodleCanvas.addEventListener("pointerdown", handleDoodlePointerDown);
+  doodleCanvas.addEventListener("pointermove", handleDoodlePointerMove);
+  doodleCanvas.addEventListener("pointerup", handleDoodlePointerUp);
+  container.append(doodleCanvas);
+
+  requestAnimationFrame(() => {
+    doodleCanvas.width = doodleCanvas.clientWidth || 420;
+    doodleCanvas.height = doodleCanvas.clientHeight || 560;
+    drawDoodlesOnCanvas(doodleCanvas, state.doodles);
+  });
 }
 
 function addDecorations(container) {
@@ -506,10 +680,20 @@ function beginDragText(event) {
   const caption = event.currentTarget;
   const strip = caption.closest(".photo-strip");
   caption.setPointerCapture(event.pointerId);
-  state.textPosition = "custom";
-  $("#textPosition").value = "custom";
+
+  const startX = event.clientX;
+  const startY = event.clientY;
+  let hasMoved = false;
 
   const move = (moveEvent) => {
+    if (!hasMoved) {
+      const dist = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
+      if (dist < 3) return;
+      hasMoved = true;
+      state.textPosition = "custom";
+      $("#textPosition").value = "custom";
+    }
+
     const rect = strip.getBoundingClientRect();
     const x = Math.max(0, Math.min(100, ((moveEvent.clientX - rect.left) / rect.width) * 100));
     const y = Math.max(0, Math.min(100, ((moveEvent.clientY - rect.top) / rect.height) * 100));
@@ -522,7 +706,9 @@ function beginDragText(event) {
   const stop = () => {
     caption.removeEventListener("pointermove", move);
     caption.removeEventListener("pointerup", stop);
-    renderAllStrips();
+    if (hasMoved) {
+      renderAllStrips();
+    }
   };
 
   caption.addEventListener("pointermove", move);
@@ -555,8 +741,7 @@ function beginDragSticker(event) {
 }
 
 async function startCapture() {
-  showScreen("capture");
-  await ensureCamera();
+  await showScreen("capture");
   state.activeSlot = findNextEmptySlot();
   renderAllStrips();
 }
@@ -569,6 +754,7 @@ async function ensureCamera() {
       audio: false,
     });
     $("#cameraVideo").srcObject = state.stream;
+    $("#cameraVideo").style.filter = getCSSFilterString(state.filter);
     updateCameraMirror();
     $("#cameraPlaceholder").classList.add("hidden");
   } catch (error) {
@@ -594,11 +780,14 @@ function stopCamera() {
 function updateCameraMirror() {
   const mirrored = state.facingMode === "user";
   $("#cameraVideo").classList.toggle("mirrored", mirrored);
-  $("#cameraVideo").classList.toggle("rear-facing", !mirrored);
 }
 
 async function captureCurrentSlot() {
-  if (state.isCounting || !state.stream) return;
+  if (state.isCounting) return;
+  if (!state.stream) {
+    alert(t("camera-error"));
+    return;
+  }
   const slot = state.activeSlot;
   if (slot < 0 || state.photos[slot]) return;
 
@@ -606,12 +795,18 @@ async function captureCurrentSlot() {
   await runCountdown();
   fireFlash();
   playShutterSound();
-  state.photos[slot] = grabFrame();
-  state.activeSlot = findNextEmptySlot();
-  state.isCounting = false;
-  renderAllStrips();
+  
+  const frameData = grabFrame();
+  state.tempCapturedFrame = {
+    dataUrl: frameData,
+    slotIndex: slot
+  };
 
-  if (state.activeSlot === -1) showScreen("review");
+  $("#tempReviewImg").src = frameData;
+  $("#tempReviewImg").style.filter = getCSSFilterString(state.filter);
+  $("#tempReviewOverlay").classList.remove("hidden");
+  
+  state.isCounting = false;
 }
 
 function uploadPhotoToSlot(event) {
@@ -686,9 +881,10 @@ function grabFrame() {
   return captureCanvas.toDataURL("image/jpeg", 0.95);
 }
 
-function deleteSlot(index) {
+async function deleteSlot(index) {
   state.photos[index] = null;
   state.activeSlot = index;
+  await showScreen("capture");
   renderAllStrips();
 }
 
@@ -700,7 +896,7 @@ function updateStatus() {
   $("#layoutLabel").textContent = t(state.layout.labelKey);
   $("#captureTitle").textContent = state.activeSlot >= 0 ? `${t("slot-label")} ${state.activeSlot + 1}` : t("all-photos-captured");
   $("#slotCounter").textContent = `${state.photos.filter(Boolean).length}/${state.layout.count} ${t("photos-count-label")}`;
-  $("#captureButton").disabled = state.activeSlot === -1 || state.isCounting;
+  $("#captureButton").disabled = state.activeSlot === -1 || state.isCounting || !state.stream;
   $("#uploadPhotoButton").disabled = state.activeSlot === -1 || state.isCounting;
   $("#nextExportButton").disabled = state.photos.some((photo) => !photo);
   $("#reviewActions").innerHTML = state.photos.map((photo, index) => (
@@ -708,15 +904,20 @@ function updateStatus() {
   )).join("");
 
   $("#reviewActions").querySelectorAll("[data-retake]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       state.activeSlot = Number(button.dataset.retake);
-      showScreen("capture");
+      await showScreen("capture");
       renderAllStrips();
     });
   });
 }
 
-function showScreen(name) {
+async function showScreen(name) {
+  if (name !== "capture") {
+    stopCamera();
+  } else {
+    await ensureCamera();
+  }
   document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
   $(`#${name}Screen`).classList.add("active");
   document.querySelectorAll(".progress-dot").forEach((dot) => {
@@ -790,12 +991,37 @@ function drawExportCanvas() {
       ctx.save();
       roundedRect(ctx, x, y, slotW, slotH, 18);
       ctx.clip();
+      ctx.filter = getCSSFilterString(state.filter);
       drawCover(ctx, img, x, y, slotW, slotH);
       ctx.restore();
     });
     drawOverlayText(ctx);
     drawExportStickers(ctx);
+    drawExportDoodles(ctx);
   });
+}
+
+function drawExportDoodles(ctx) {
+  ctx.save();
+  state.doodles.forEach((stroke) => {
+    if (stroke.points.length < 1) return;
+    ctx.beginPath();
+    ctx.strokeStyle = stroke.color;
+    const scaledWidth = stroke.width * (exportCanvas.width / 420);
+    ctx.lineWidth = Math.max(1, scaledWidth);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    
+    const start = stroke.points[0];
+    ctx.moveTo((start.x / 100) * exportCanvas.width, (start.y / 100) * exportCanvas.height);
+    
+    for (let i = 1; i < stroke.points.length; i++) {
+      const pt = stroke.points[i];
+      ctx.lineTo((pt.x / 100) * exportCanvas.width, (pt.y / 100) * exportCanvas.height);
+    }
+    ctx.stroke();
+  });
+  ctx.restore();
 }
 
 function loadImage(src) {
@@ -865,12 +1091,16 @@ function downloadStrip() {
 }
 
 function downloadPhotos() {
+  let delay = 0;
   state.photoDownloads.forEach((item, index) => {
     if (!item.selected) return;
-    const link = document.createElement("a");
-    link.download = `${safeFileName(item.name || (state.lang === "vi" ? `anh-photobooth-${index + 1}` : `photobooth-photo-${index + 1}`))}.jpg`;
-    link.href = item.photo;
-    link.click();
+    setTimeout(() => {
+      const link = document.createElement("a");
+      link.download = `${safeFileName(item.name || (state.lang === "vi" ? `anh-photobooth-${index + 1}` : `photobooth-photo-${index + 1}`))}.jpg`;
+      link.href = item.photo;
+      link.click();
+    }, delay);
+    delay += 300;
   });
 }
 
@@ -903,6 +1133,14 @@ async function shareStrip() {
 function newSession() {
   resetPhotos();
   showScreen("setup");
+  renderAllStrips();
+}
+
+function retakeAll() {
+  resetPhotos();
+  state.tempCapturedFrame = null;
+  $("#tempReviewOverlay").classList.add("hidden");
+  showScreen("capture");
   renderAllStrips();
 }
 

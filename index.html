@@ -85,6 +85,47 @@
             <p class="hint" data-i18n="text-hint">Kéo trực tiếp văn bản trên phần xem trước để đặt ở bất kỳ đâu.</p>
           </div>
 
+          <div class="control-group">
+            <h2 data-i18n="filter-label">Bộ lọc màu</h2>
+            <select id="filterSelect">
+              <option value="none">Bình thường (None)</option>
+              <option value="grayscale">Đen trắng (B&W)</option>
+              <option value="sepia">Hoài cổ (Sepia)</option>
+              <option value="warm">Ấm áp (Warm)</option>
+              <option value="cold">Lạnh lùng (Cold)</option>
+              <option value="vintage">Cổ điển (Vintage)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <div class="section-title">
+              <h2 data-i18n="doodle-label">Vẽ tay / Bút màu</h2>
+              <label class="toggle-line">
+                <input type="checkbox" id="doodleToggle">
+                <span data-i18n="doodle-active">Kích hoạt bút vẽ</span>
+              </label>
+            </div>
+            <div class="inline-fields" id="doodleSettings" style="display: none;">
+              <label>
+                <span data-i18n="doodle-color">Màu sắc</span>
+                <input type="color" id="doodleColor" value="#e0442f">
+              </label>
+              <label>
+                <span data-i18n="doodle-size">Cỡ bút</span>
+                <select id="doodleSize">
+                  <option value="4">Mảnh</option>
+                  <option value="8" selected>Vừa</option>
+                  <option value="12">Dày</option>
+                  <option value="20">Rất dày</option>
+                </select>
+              </label>
+              <label style="justify-content: end;">
+                <span>&nbsp;</span>
+                <button type="button" class="secondary-action" id="doodleClear" data-i18n="doodle-clear" style="padding: 0 10px; min-height: 38px;">Xóa vẽ</button>
+              </label>
+            </div>
+          </div>
+
           <div class="control-group compact">
             <h2 data-i18n="countdown">Đếm ngược</h2>
             <div class="segmented" id="countdownOptions">
@@ -120,6 +161,13 @@
             <div class="camera-placeholder" id="cameraPlaceholder" data-i18n="camera-not-ready">Camera chưa sẵn sàng</div>
             <div class="countdown-badge" id="countdownBadge"></div>
             <div class="flash" id="flash"></div>
+            <div class="temp-review-overlay hidden" id="tempReviewOverlay">
+              <img id="tempReviewImg" alt="Captured Frame Preview">
+              <div class="temp-review-actions">
+                <button type="button" class="secondary-action" id="tempRetakeBtn" data-i18n="temp-retake">Chụp lại</button>
+                <button type="button" class="primary-action" id="tempConfirmBtn" data-i18n="temp-confirm">Lưu ảnh</button>
+              </div>
+            </div>
           </div>
           <div class="capture-actions">
             <button class="secondary-action" id="backSetupButton" type="button" data-i18n="back-btn">Quay lại thiết lập</button>
@@ -165,7 +213,10 @@
             <p class="eyebrow" data-i18n="review-eyebrow">Xem lại</p>
             <h2 data-i18n="review-title">Kiểm tra ảnh của bạn trước khi xuất</h2>
           </div>
-          <button class="primary-action" id="nextExportButton" type="button" disabled data-i18n="next-btn">Tiếp tục</button>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button class="secondary-action" id="retakeAllReviewBtn" type="button" data-i18n="retake-all-btn">Chụp lại toàn bộ</button>
+            <button class="primary-action" id="nextExportButton" type="button" disabled data-i18n="next-btn">Tiếp tục</button>
+          </div>
         </div>
         <div class="strip-stage">
           <div id="reviewStrip" class="photo-strip"></div>
@@ -200,6 +251,7 @@
             <div id="photoDownloadList" class="photo-download-list"></div>
           </div>
           <button class="secondary-action" id="downloadPhotosButton" type="button" data-i18n="download-selected-btn">Tải ảnh đã chọn</button>
+          <button class="secondary-action" id="retakeAllExportBtn" type="button" data-i18n="retake-all-btn">Chụp lại toàn bộ</button>
           <button class="ghost-action" id="newSessionButton" type="button" data-i18n="new-session-btn">Tạo bộ ảnh mới</button>
         </aside>
       </div>
