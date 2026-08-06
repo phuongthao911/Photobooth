@@ -1205,6 +1205,19 @@ function openCropModal(imageSrc, slotIndex) {
     cropState.y = (vH - cropState.imgHeight) / 2;
     
     updateCropImageTransform();
+
+    // Populate debug display
+    const debugDiv = $("#cropDebug");
+    if (debugDiv) {
+      debugDiv.style.display = "block";
+      debugDiv.textContent = `vW: ${vW}, vH: ${vH}\n` +
+        `naturalWidth: ${img.naturalWidth}, naturalHeight: ${img.naturalHeight}\n` +
+        `scaleToCover: ${scaleToCover}\n` +
+        `imgWidth: ${cropState.imgWidth}, imgHeight: ${cropState.imgHeight}\n` +
+        `x: ${cropState.x}, y: ${cropState.y}\n` +
+        `scale: ${cropState.scale}\n` +
+        `imageSrc length: ${imageSrc ? imageSrc.length : 0}`;
+    }
   };
   
   img.src = imageSrc;
