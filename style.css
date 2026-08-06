@@ -390,7 +390,8 @@ label {
 }
 
 .slot img,
-.slot video {
+.slot video,
+.slot canvas.live-canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;

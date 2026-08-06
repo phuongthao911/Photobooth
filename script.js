@@ -554,6 +554,29 @@ function drawDoodlesOnCanvas(canvas, doodles) {
   });
 }
 
+let liveCanvasLoopId = null;
+function startLiveCanvasLoop(canvas) {
+  const video = $("#cameraVideo");
+  const ctx = canvas.getContext("2d");
+  
+  if (liveCanvasLoopId) {
+    cancelAnimationFrame(liveCanvasLoopId);
+  }
+  
+  function tick() {
+    if (!state.stream || !canvas.isConnected) {
+      return;
+    }
+    if (video.videoWidth > 0) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+    liveCanvasLoopId = requestAnimationFrame(tick);
+  }
+  liveCanvasLoopId = requestAnimationFrame(tick);
+}
+
 function renderAllStrips() {
   renderStrip(setupPreview, { mode: "setup" });
   renderStrip(captureStrip, { mode: "capture" });
@@ -563,9 +586,6 @@ function renderAllStrips() {
 
 function renderStrip(container, { mode }) {
   container.className = `photo-strip ${state.layout.orientation} ${state.frame.id}`;
-
-  // Find existing video element to reuse before clearing
-  const existingVideo = container.querySelector("video");
   container.innerHTML = "";
 
   for (let index = 0; index < state.layout.count; index += 1) {
@@ -584,21 +604,14 @@ function renderStrip(container, { mode }) {
       img.style.filter = getCSSFilterString(state.filter);
       slot.append(img);
     } else if (mode === "capture" && index === state.activeSlot && state.stream) {
-      let video;
-      if (existingVideo) {
-        video = existingVideo;
-      } else {
-        video = $("#cameraVideo").cloneNode();
-        video.autoplay = true;
-        video.playsInline = true;
-        video.muted = true;
+      const canvas = document.createElement("canvas");
+      canvas.className = "live-canvas";
+      if (state.facingMode === "user") {
+        canvas.style.transform = "scaleX(-1)";
       }
-      if (video.srcObject !== state.stream) {
-        video.srcObject = state.stream;
-      }
-      video.className = state.facingMode === "user" ? "mirrored" : "";
-      video.style.filter = getCSSFilterString(state.filter);
-      slot.append(video);
+      canvas.style.filter = getCSSFilterString(state.filter);
+      slot.append(canvas);
+      startLiveCanvasLoop(canvas);
     }
 
     if (mode === "review" && state.photos[index]) {
