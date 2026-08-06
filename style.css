@@ -770,3 +770,82 @@ label {
   pointer-events: auto;
 }
 
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.modal.hidden {
+  display: none !important;
+}
+.modal-content {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+.modal-content h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.crop-viewport-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #121212;
+  border-radius: 8px;
+  padding: 10px;
+}
+.crop-viewport {
+  position: relative;
+  overflow: hidden;
+  background: #222;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+#cropImage {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  transform-origin: center center;
+}
+.crop-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.zoom-slider-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.zoom-slider-group input {
+  flex: 1;
+}
+.crop-actions {
+  display: flex;
+  gap: 12px;
+}
+.crop-actions button {
+  flex: 1;
+}
+
+

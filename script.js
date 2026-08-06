@@ -77,7 +77,11 @@ const translations = {
     "doodle-size": "Cỡ bút",
     "doodle-clear": "Xóa vẽ",
     "retake-all-btn": "Chụp lại toàn bộ",
-    "doodle-active": "Kích hoạt bút vẽ"
+    "doodle-active": "Kích hoạt bút vẽ",
+    "crop-title": "Cắt chỉnh ảnh",
+    "crop-cancel-btn": "Hủy",
+    "crop-confirm-btn": "Cắt ảnh",
+    "zoom-label": "Thu phóng"
   },
   en: {
     "app-title": "Create a custom photo strip",
@@ -157,7 +161,11 @@ const translations = {
     "doodle-size": "Brush size",
     "doodle-clear": "Clear drawings",
     "retake-all-btn": "Retake all",
-    "doodle-active": "Enable drawing brush"
+    "doodle-active": "Enable drawing brush",
+    "crop-title": "Crop image",
+    "crop-cancel-btn": "Cancel",
+    "crop-confirm-btn": "Crop",
+    "zoom-label": "Zoom"
   }
 };
 
@@ -287,6 +295,7 @@ function init() {
   bindControls();
   resetPhotos();
   renderAllStrips();
+  initCropEvents();
 }
 
 function renderLayoutOptions() {
@@ -817,10 +826,7 @@ function uploadPhotoToSlot(event) {
 
   const reader = new FileReader();
   reader.onload = () => {
-    state.photos[slot] = reader.result;
-    state.activeSlot = findNextEmptySlot();
-    renderAllStrips();
-    if (state.activeSlot === -1) showScreen("review");
+    openCropModal(reader.result, slot);
   };
   reader.readAsDataURL(file);
 }
@@ -1142,6 +1148,190 @@ function retakeAll() {
   $("#tempReviewOverlay").classList.add("hidden");
   showScreen("capture");
   renderAllStrips();
+}
+
+const cropState = {
+  img: null,
+  scale: 1,
+  x: 0,
+  y: 0,
+  startX: 0,
+  startY: 0,
+  isDragging: false,
+  aspectRatio: 4 / 3,
+  slotIndex: -1,
+  imgWidth: 0,
+  imgHeight: 0
+};
+
+function openCropModal(imageSrc, slotIndex) {
+  cropState.slotIndex = slotIndex;
+  
+  const horizontal = state.layout.orientation === "horizontal";
+  cropState.aspectRatio = horizontal ? 3 / 4 : 4 / 3;
+  
+  const viewport = $("#cropViewport");
+  const img = $("#cropImage");
+  
+  const maxDim = 360;
+  if (cropState.aspectRatio >= 1) {
+    viewport.style.width = `${maxDim}px`;
+    viewport.style.height = `${maxDim / cropState.aspectRatio}px`;
+  } else {
+    viewport.style.width = `${maxDim * cropState.aspectRatio}px`;
+    viewport.style.height = `${maxDim}px`;
+  }
+  
+  img.src = imageSrc;
+  
+  img.onload = () => {
+    cropState.scale = 1;
+    cropState.x = 0;
+    cropState.y = 0;
+    $("#cropZoom").value = 1;
+    
+    const vW = viewport.clientWidth;
+    const vH = viewport.clientHeight;
+    
+    const scaleToCover = Math.max(vW / img.naturalWidth, vH / img.naturalHeight);
+    cropState.imgWidth = img.naturalWidth * scaleToCover;
+    cropState.imgHeight = img.naturalHeight * scaleToCover;
+    
+    img.style.width = `${cropState.imgWidth}px`;
+    img.style.height = `${cropState.imgHeight}px`;
+    
+    cropState.x = (vW - cropState.imgWidth) / 2;
+    cropState.y = (vH - cropState.imgHeight) / 2;
+    
+    updateCropImageTransform();
+    $("#cropModal").classList.remove("hidden");
+  };
+}
+
+function updateCropImageTransform() {
+  const img = $("#cropImage");
+  img.style.transform = `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`;
+}
+
+let isCropDragging = false;
+let cropStartPointer = { x: 0, y: 0 };
+let cropStartOffset = { x: 0, y: 0 };
+
+function initCropEvents() {
+  const img = $("#cropImage");
+  const viewport = $("#cropViewport");
+  
+  viewport.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    isCropDragging = true;
+    viewport.setPointerCapture(e.pointerId);
+    cropStartPointer = { x: e.clientX, y: e.clientY };
+    cropStartOffset = { x: cropState.x, y: cropState.y };
+  });
+  
+  viewport.addEventListener("pointermove", (e) => {
+    if (!isCropDragging) return;
+    const dx = e.clientX - cropStartPointer.x;
+    const dy = e.clientY - cropStartPointer.y;
+    
+    const vW = viewport.clientWidth;
+    const vH = viewport.clientHeight;
+    
+    const currentW = cropState.imgWidth * cropState.scale;
+    const currentH = cropState.imgHeight * cropState.scale;
+    
+    let newX = cropStartOffset.x + dx;
+    let newY = cropStartOffset.y + dy;
+    
+    const minX = Math.min(0, vW - currentW);
+    const minY = Math.min(0, vH - currentH);
+    
+    cropState.x = Math.max(minX, Math.min(0, newX));
+    cropState.y = Math.max(minY, Math.min(0, newY));
+    
+    updateCropImageTransform();
+  });
+  
+  viewport.addEventListener("pointerup", (e) => {
+    isCropDragging = false;
+  });
+  
+  $("#cropZoom").addEventListener("input", (e) => {
+    const prevScale = cropState.scale;
+    cropState.scale = parseFloat(e.target.value);
+    
+    const vW = viewport.clientWidth;
+    const vH = viewport.clientHeight;
+    
+    const cX = vW / 2;
+    const cY = vH / 2;
+    
+    cropState.x = cX - (cX - cropState.x) * (cropState.scale / prevScale);
+    cropState.y = cY - (cY - cropState.y) * (cropState.scale / prevScale);
+    
+    const currentW = cropState.imgWidth * cropState.scale;
+    const currentH = cropState.imgHeight * cropState.scale;
+    const minX = Math.min(0, vW - currentW);
+    const minY = Math.min(0, vH - currentH);
+    cropState.x = Math.max(minX, Math.min(0, cropState.x));
+    cropState.y = Math.max(minY, Math.min(0, cropState.y));
+    
+    updateCropImageTransform();
+  });
+  
+  $("#cropCancelBtn").addEventListener("click", () => {
+    $("#cropModal").classList.add("hidden");
+    $("#cropImage").src = "";
+  });
+  
+  $("#cropConfirmBtn").addEventListener("click", () => {
+    performCrop();
+  });
+}
+
+function performCrop() {
+  const img = $("#cropImage");
+  const viewport = $("#cropViewport");
+  const slot = cropState.slotIndex;
+  if (slot < 0) return;
+  
+  const targetW = cropState.aspectRatio >= 1 ? 1280 : 960;
+  const targetH = cropState.aspectRatio >= 1 ? 960 : 1280;
+  
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  
+  const vW = viewport.clientWidth;
+  const vH = viewport.clientHeight;
+  
+  // Calculate rendering transform projection
+  // To draw correctly onto output canvas, we map viewport coordinate offsets
+  // relative to the scaled image width/height.
+  const rX = targetW / vW;
+  const rY = targetH / vH;
+  
+  const currentW = cropState.imgWidth * cropState.scale;
+  const currentH = cropState.imgHeight * cropState.scale;
+  
+  const outW = currentW * rX;
+  const outH = currentH * rY;
+  const outX = cropState.x * rX;
+  const outY = cropState.y * rY;
+  
+  ctx.drawImage(img, outX, outY, outW, outH);
+  
+  state.photos[slot] = canvas.toDataURL("image/jpeg", 0.95);
+  state.activeSlot = findNextEmptySlot();
+  
+  $("#cropModal").classList.add("hidden");
+  img.src = "";
+  
+  renderAllStrips();
+  if (state.activeSlot === -1) {
+    showScreen("review");
+  }
 }
 
 init();
