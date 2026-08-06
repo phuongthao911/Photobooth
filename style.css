@@ -822,7 +822,7 @@ label {
   cursor: move;
   user-select: none;
   touch-action: none;
-  transform-origin: center center;
+  transform-origin: 0 0;
 }
 .crop-controls {
   display: flex;

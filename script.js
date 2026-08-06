@@ -1294,40 +1294,46 @@ function performCrop() {
   const viewport = $("#cropViewport");
   const slot = cropState.slotIndex;
   if (slot < 0) return;
-  
+
   const targetW = cropState.aspectRatio >= 1 ? 1280 : 960;
   const targetH = cropState.aspectRatio >= 1 ? 960 : 1280;
-  
+
+  const vW = viewport.clientWidth;
+  const vH = viewport.clientHeight;
+
+  // Tỉ lệ giữa kích thước hiển thị trên màn hình và kích thước gốc của ảnh
+  const coverScale = cropState.imgWidth / img.naturalWidth;
+  const displayScale = coverScale * cropState.scale;
+
+  // Vùng ảnh GỐC đang hiển thị trong khung xem (đơn vị: pixel ảnh gốc)
+  let sx = (0 - cropState.x) / displayScale;
+  let sy = (0 - cropState.y) / displayScale;
+  let sWidth = vW / displayScale;
+  let sHeight = vH / displayScale;
+
+  // Kẹp trong biên ảnh gốc — không bao giờ để vùng vẽ rỗng
+  sx = Math.max(0, Math.min(sx, img.naturalWidth - 1));
+  sy = Math.max(0, Math.min(sy, img.naturalHeight - 1));
+  sWidth = Math.min(sWidth, img.naturalWidth - sx);
+  sHeight = Math.min(sHeight, img.naturalHeight - sy);
+
   const canvas = document.createElement("canvas");
   canvas.width = targetW;
   canvas.height = targetH;
   const ctx = canvas.getContext("2d");
-  
-  const vW = viewport.clientWidth;
-  const vH = viewport.clientHeight;
-  
-  // Calculate rendering transform projection
-  // To draw correctly onto output canvas, we map viewport coordinate offsets
-  // relative to the scaled image width/height.
-  const rX = targetW / vW;
-  const rY = targetH / vH;
-  
-  const currentW = cropState.imgWidth * cropState.scale;
-  const currentH = cropState.imgHeight * cropState.scale;
-  
-  const outW = currentW * rX;
-  const outH = currentH * rY;
-  const outX = cropState.x * rX;
-  const outY = cropState.y * rY;
-  
-  ctx.drawImage(img, outX, outY, outW, outH);
-  
+
+  // Lưới an toàn: tô nền trắng trước, phòng khi còn khoảng hở do làm tròn số
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, targetW, targetH);
+
+  ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetW, targetH);
+
   state.photos[slot] = canvas.toDataURL("image/jpeg", 0.95);
   state.activeSlot = findNextEmptySlot();
-  
+
   $("#cropModal").classList.add("hidden");
   img.src = "";
-  
+
   renderAllStrips();
   if (state.activeSlot === -1) {
     showScreen("review");
