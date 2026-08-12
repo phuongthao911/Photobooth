@@ -779,17 +779,53 @@ async function startCapture() {
 
 async function ensureCamera() {
   if (state.stream) return;
+  
+  const placeholder = $("#cameraPlaceholder");
+  
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (window.location.protocol !== "https:" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      placeholder.textContent = state.lang === "vi" 
+        ? "Lỗi: Camera yêu cầu kết nối bảo mật HTTPS. Vui lòng truy cập bằng https://" 
+        : "Error: Camera requires a secure HTTPS connection. Please access via https://";
+    } else {
+      placeholder.textContent = t("camera-error");
+    }
+    placeholder.classList.remove("hidden");
+    return;
+  }
+
   try {
+    // Try preferred constraints
     state.stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: state.facingMode } },
       audio: false,
     });
-    $("#cameraVideo").srcObject = state.stream;
-    $("#cameraVideo").style.filter = getCSSFilterString(state.filter);
-    updateCameraMirror();
-    $("#cameraPlaceholder").classList.add("hidden");
   } catch (error) {
-    $("#cameraPlaceholder").textContent = t("camera-error");
+    console.warn("Camera with facingMode failed, retrying with basic constraints", error);
+    try {
+      // Fallback constraints
+      state.stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
+    } catch (fallbackError) {
+      console.error("All camera constraints failed", fallbackError);
+      placeholder.textContent = t("camera-error");
+      placeholder.classList.remove("hidden");
+      return;
+    }
+  }
+
+  try {
+    const video = $("#cameraVideo");
+    video.srcObject = state.stream;
+    video.style.filter = getCSSFilterString(state.filter);
+    updateCameraMirror();
+    placeholder.classList.add("hidden");
+    // Explicitly trigger play for iOS compatibility
+    await video.play();
+  } catch (playError) {
+    console.error("Video play failed", playError);
   }
 }
 
