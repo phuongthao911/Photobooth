@@ -59,6 +59,9 @@ const translations = {
     "frame-neon": "Neon",
     "frame-clean": "Tối giản (Clean)",
     "frame-film": "Dải phim (Film)",
+    "frame-floral": "Hoa hồng 20.10 (Floral)",
+    "frame-princess": "Nơ công chúa (Princess)",
+    "frame-cinema": "Vé xem phim (Cinema)",
 
     "camera-error": "Không thể mở camera. Vui lòng cho phép quyền truy cập camera trên trình duyệt của bạn.",
     "camera-opening": "Đang mở camera...",
@@ -143,6 +146,9 @@ const translations = {
     "frame-neon": "Neon",
     "frame-clean": "Clean",
     "frame-film": "Film Strip",
+    "frame-floral": "Rose Floral (20.10)",
+    "frame-princess": "Princess Ribbon",
+    "frame-cinema": "Cinema Ticket",
 
     "camera-error": "Camera could not be opened. Please allow camera access in your browser.",
     "camera-opening": "Opening camera...",
@@ -183,6 +189,9 @@ const frames = [
   { id: "neon", labelKey: "frame-neon", swatch: "#111827" },
   { id: "clean", labelKey: "frame-clean", swatch: "#ffffff" },
   { id: "film", labelKey: "frame-film", swatch: "#151515" },
+  { id: "floral", labelKey: "frame-floral", swatch: "#fff5f5" },
+  { id: "princess", labelKey: "frame-princess", swatch: "#ffeef2" },
+  { id: "cinema", labelKey: "frame-cinema", swatch: "#1e3a8a" },
 ];
 
 const stickers = [
@@ -1008,12 +1017,17 @@ function drawExportCanvas() {
       const x = horizontal ? pad + index * (slotW + gap) : pad;
       const y = horizontal ? pad : pad + index * (slotH + gap);
       ctx.save();
-      roundedRect(ctx, x, y, slotW, slotH, 18);
+      if (state.frame.id === "princess") {
+        roundedRect(ctx, x, y, slotW, slotH, Math.min(slotW, slotH) / 2);
+      } else {
+        roundedRect(ctx, x, y, slotW, slotH, 18);
+      }
       ctx.clip();
       ctx.filter = getCSSFilterString(state.filter);
       drawCover(ctx, img, x, y, slotW, slotH);
       ctx.restore();
     });
+    drawFrameDecorations(ctx, exportCanvas.width, exportCanvas.height);
     drawOverlayText(ctx);
     drawExportStickers(ctx);
     drawExportDoodles(ctx);
@@ -1052,7 +1066,16 @@ function loadImage(src) {
 }
 
 function paintFrameBackground(ctx, width, height) {
-  const colors = { vintage: "#f5ead3", polaroid: "#fbfbf7", neon: "#111827", clean: "#ffffff", film: "#151515" };
+  const colors = { 
+    vintage: "#f5ead3", 
+    polaroid: "#fbfbf7", 
+    neon: "#111827", 
+    clean: "#ffffff", 
+    film: "#151515",
+    floral: "#fff5f5",
+    princess: "#ffeef2",
+    cinema: "#1e3a8a"
+  };
   ctx.fillStyle = colors[state.frame.id] || "#fff";
   ctx.fillRect(0, 0, width, height);
   if (state.frame.id === "film") {
@@ -1061,6 +1084,84 @@ function paintFrameBackground(ctx, width, height) {
       ctx.fillRect(16, y, 28, 30);
       ctx.fillRect(width - 44, y, 28, 30);
     }
+  }
+}
+
+function drawFrameDecorations(ctx, width, height) {
+  const horizontal = state.layout.orientation === "horizontal";
+  if (state.frame.id === "floral") {
+    ctx.save();
+    ctx.fillStyle = "#e11d48";
+    ctx.font = "bold 32px 'Playfair Display', serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Chúc mừng ngày PHỤ NỮ VIỆT NAM 20.10", width / 2, 45);
+    
+    ctx.font = "64px Inter";
+    ctx.fillText("🌹", 65, 45);
+    ctx.fillText("🌹", width - 65, 45);
+    ctx.fillText("🌸", 60, height - 70);
+    ctx.fillText("🌺", width - 60, height - 70);
+    
+    ctx.fillStyle = "#4b5563";
+    ctx.font = "italic 24px 'Inter', sans-serif";
+    ctx.fillText("“Xinh đẹp trong từng khoảnh khắc”", width / 2, height - 85);
+    
+    ctx.textAlign = "left";
+    ctx.font = "22px Inter";
+    ctx.fillStyle = "#f43f5e";
+    ctx.fillText("❤️ 💬 ➔  999,666 likes", 50, height - 35);
+    ctx.restore();
+  } else if (state.frame.id === "princess") {
+    ctx.save();
+    ctx.fillStyle = "rgba(244, 63, 94, 0.15)";
+    ctx.font = "32px Inter";
+    ctx.fillText("✨", 40, 80);
+    ctx.fillText("✨", width - 60, 120);
+    ctx.fillText("✨", 80, height - 100);
+    
+    ctx.font = "96px Inter";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🎀", width / 2, 40);
+    ctx.fillText("🎀", width / 2, height - 70);
+    
+    ctx.font = "54px Inter";
+    ctx.fillText("🦋", 70, height - 40);
+    ctx.fillText("🦋", width - 70, height - 40);
+    ctx.restore();
+  } else if (state.frame.id === "cinema") {
+    ctx.save();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px 'Space Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("★ S-MOVIE TICKET ★", width / 2, 45);
+    
+    ctx.strokeStyle = "#475569";
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath();
+    ctx.moveTo(30, 75);
+    ctx.lineTo(width - 30, 75);
+    ctx.moveTo(30, height - 95);
+    ctx.lineTo(width - 30, height - 95);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "20px 'Space Mono', monospace";
+    ctx.textAlign = "left";
+    ctx.fillText("DATE: SUNDAY, AUG 12", 40, height - 60);
+    ctx.textAlign = "right";
+    ctx.fillText("ROW: 01  SEAT: 23  ADMIT ONE", width - 40, height - 60);
+    
+    ctx.fillStyle = "#0f172a";
+    for (let y = 15; y < height; y += 45) {
+      ctx.beginPath();
+      ctx.arc(0, y, 12, 0, Math.PI * 2);
+      ctx.arc(width, y, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 }
 
