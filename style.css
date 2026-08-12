@@ -638,6 +638,7 @@ label {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none; /* Prevents tapping to trigger native iOS fullscreen player */
 }
 
 #cameraVideo.mirrored {
